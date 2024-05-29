@@ -42,8 +42,39 @@
         text-align: center;
     }
 
+    input[type="text"] {
+        width: 80px;
+    }
+
     .questions {
         margin: 20px;
+    }
+
+    .questions p {
+        font-size: 18px;
+    }
+
+    .questions h2 {
+        font-size: 24px;
+    }
+
+    .question-check {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-size: contain;
+    }
+
+    .check-ok {
+        background-image: url('https://img.icons8.com/ios-filled/50/000000/checkmark.png');
+    }
+
+    .check-ko {
+        background-image: url('https://img.icons8.com/ios-filled/50/000000/cancel.png');
+    }
+
+    .spacer {
+        margin-bottom: 20px;
     }
 </style>
 </head>
@@ -70,13 +101,14 @@
     <canvas id="animationCanvas"></canvas>
 </div>
 <div class="table-container">
+    <p>Realiza los cálculos adecuados y completa la tabla. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
     <table>
         <thead>
             <tr>
                 <th></th>
-                <th>\(p_{A}\)</th>
-                <th>\(p_{R}\)</th>
-                <th>\(p_{o}\)</th>
+                <th>p<sub>A</sub></th>
+                <th>p<sub>R</sub></th>
+                <th>p<sub>o</sub></th>
             </tr>
         </thead>
         <tbody>
@@ -94,13 +126,14 @@
             </tr>
         </tbody>
     </table>
+    <div class="spacer"></div>
     <table>
         <thead>
             <tr>
                 <th></th>
-                <th>\(E_{A}\)</th>
-                <th>\(E_{R}\)</th>
-                <th>\(E_{o}\)</th>
+                <th>E<sub>A</sub></th>
+                <th>E<sub>R</sub></th>
+                <th>E<sub>o</sub></th>
             </tr>
         </thead>
         <tbody>
@@ -121,32 +154,42 @@
     <button id="submit">Enviar</button>
 </div>
 <div class="questions">
-    <p>1. El momento lineal de cada bola antes de la colisión es igual al momento lineal de cada bola después de la colisión. V / F</p>
+    <h2>Preguntas</h2>
+    <p>1. El momento lineal de cada bola antes de la colisión es igual al momento lineal de cada bola después de la colisión.</p>
     <select id="q1">
-        <option value="V">V</option>
-        <option value="F">F</option>
+        <option value="">- Sin seleccionar -</option>
+        <option value="V">Verdadero</option>
+        <option value="F">Falso</option>
     </select>
-    <p>2. El momento lineal total antes de la colisión es igual al momento lineal total después de la colisión. V / F</p>
+    <span class="question-check" id="q1-check"></span>
+    <p>2. El momento lineal total antes de la colisión es igual al momento lineal total después de la colisión.</p>
     <select id="q2">
-        <option value="V">V</option>
-        <option value="F">F</option>
+        <option value="">- Sin seleccionar -</option>
+        <option value="V">Verdadero</option>
+        <option value="F">Falso</option>
     </select>
-    <p>3. La energía cinética de cada bola antes de la colisión es igual a la energía cinética de cada bola después de la colisión. V / F</p>
+    <span class="question-check" id="q2-check"></span>
+    <p>3. La energía cinética de cada bola antes de la colisión es igual a la energía cinética de cada bola después de la colisión.</p>
     <select id="q3">
-        <option value="V">V</option>
-        <option value="F">F</option>
+        <option value="">- Sin seleccionar -</option>
+        <option value="V">Verdadero</option>
+        <option value="F">Falso</option>
     </select>
-    <p>4. La energía cinética total antes de la colisión es igual a la energía cinética total después de la colisión. V / F</p>
+    <span class="question-check" id="q3-check"></span>
+    <p>4. La energía cinética total antes de la colisión es igual a la energía cinética total después de la colisión.</p>
     <select id="q4">
-        <option value="V">V</option>
-        <option value="F">F</option>
+        <option value="">- Sin seleccionar -</option>
+        <option value="V">Verdadero</option>
+        <option value="F">Falso</option>
     </select>
+    <span class="question-check" id="q4-check"></span>
     <p>5. Este choque es un choque:</p>
     <select id="q5">
         <option value="elástico">Elástico</option>
         <option value="inelástico">Inelástico</option>
     </select>
-    <br>
+    <span class="question-check" id="q5-check"></span>
+    <br><br>
     <button id="check">Corregir</button>
 </div>
 <p>Autor: Antonio González García</p>
@@ -336,11 +379,14 @@
 
     function validateInput(value, correctValue, elementId) {
         const element = document.getElementById(elementId);
+        const checkElement = document.createElement('span');
+        checkElement.className = 'question-check';
         if (parseFloat(value) === correctValue) {
-            element.style.color = 'green';
+            checkElement.classList.add('check-ok');
         } else {
-            element.style.color = 'red';
+            checkElement.classList.add('check-ko');
         }
+        element.parentNode.appendChild(checkElement);
     }
 
     checkButton.onclick = () => {
@@ -358,11 +404,12 @@
     };
 
     function validateQuestion(answer, correctAnswer, elementId) {
-        const element = document.getElementById(elementId);
+        const element = document.getElementById(elementId + '-check');
+        element.className = 'question-check';
         if (answer === correctAnswer) {
-            element.style.color = 'green';
+            element.classList.add('check-ok');
         } else {
-            element.style.color = 'red';
+            element.classList.add('check-ko');
         }
     }
 
