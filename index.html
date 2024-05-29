@@ -9,6 +9,12 @@
         font-family: Arial, sans-serif;
     }
 
+    .title {
+        font-size: 24px;
+        text-align: center;
+        margin: 20px 0;
+    }
+
     .controls {
         margin: 20px;
     }
@@ -66,11 +72,11 @@
     }
 
     .check-ok {
-        background-image: url('https://img.icons8.com/ios-filled/50/000000/checkmark.png');
+        background-image: url('https://img.icons8.com/color/48/000000/checkmark--v1.png');
     }
 
     .check-ko {
-        background-image: url('https://img.icons8.com/ios-filled/50/000000/cancel.png');
+        background-image: url('https://img.icons8.com/color/48/000000/cancel--v1.png');
     }
 
     .spacer {
@@ -79,6 +85,7 @@
 </style>
 </head>
 <body>
+<div class="title">Tema 10. Leyes de Newton. Choques (I)</div>
 <div class="controls">
     <label for="mass1">Masa de la bola azul:</label>
     <input type="range" id="mass1" min="1" max="10" value="5">
@@ -101,14 +108,14 @@
     <canvas id="animationCanvas"></canvas>
 </div>
 <div class="table-container">
-    <p>Realiza los cálculos adecuados y completa la tabla. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
+    <p>Realiza los cálculos adecuados redondeando hasta la centésima y completa la tabla. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
     <table>
         <thead>
             <tr>
                 <th></th>
                 <th>p<sub>A</sub></th>
                 <th>p<sub>R</sub></th>
-                <th>p<sub>o</sub></th>
+                <th>p<sub>T</sub></th>
             </tr>
         </thead>
         <tbody>
@@ -116,13 +123,13 @@
                 <td>Antes</td>
                 <td><input type="text" id="pA-before"> kg·m/s</td>
                 <td><input type="text" id="pR-before"> kg·m/s</td>
-                <td><input type="text" id="pO-before"> kg·m/s</td>
+                <td><input type="text" id="pT-before"> kg·m/s</td>
             </tr>
             <tr>
                 <td>Después</td>
                 <td><input type="text" id="pA-after"> kg·m/s</td>
                 <td><input type="text" id="pR-after"> kg·m/s</td>
-                <td><input type="text" id="pO-after"> kg·m/s</td>
+                <td><input type="text" id="pT-after"> kg·m/s</td>
             </tr>
         </tbody>
     </table>
@@ -131,23 +138,23 @@
         <thead>
             <tr>
                 <th></th>
-                <th>E<sub>A</sub></th>
-                <th>E<sub>R</sub></th>
-                <th>E<sub>o</sub></th>
+                <th>Ec<sub>A</sub></th>
+                <th>Ec<sub>R</sub></th>
+                <th>Ec<sub>T</sub></th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Antes</td>
-                <td><input type="text" id="eA-before"> J</td>
-                <td><input type="text" id="eR-before"> J</td>
-                <td><input type="text" id="eO-before"> J</td>
+                <td><input type="text" id="ecA-before"> J</td>
+                <td><input type="text" id="ecR-before"> J</td>
+                <td><input type="text" id="ecT-before"> J</td>
             </tr>
             <tr>
                 <td>Después</td>
-                <td><input type="text" id="eA-after"> J</td>
-                <td><input type="text" id="eR-after"> J</td>
-                <td><input type="text" id="eO-after"> J</td>
+                <td><input type="text" id="ecA-after"> J</td>
+                <td><input type="text" id="ecR-after"> J</td>
+                <td><input type="text" id="ecT-after"> J</td>
             </tr>
         </tbody>
     </table>
@@ -336,52 +343,52 @@
     submitButton.onclick = () => {
         const pABefore = document.getElementById('pA-before').value;
         const pRBefore = document.getElementById('pR-before').value;
-        const pOBefore = document.getElementById('pO-before').value;
+        const pTBefore = document.getElementById('pT-before').value;
         const pAAfter = document.getElementById('pA-after').value;
         const pRAfter = document.getElementById('pR-after').value;
-        const pOAfter = document.getElementById('pO-after').value;
+        const pTAfter = document.getElementById('pT-after').value;
 
-        const eABefore = document.getElementById('eA-before').value;
-        const eRBefore = document.getElementById('eR-before').value;
-        const eOBefore = document.getElementById('eO-before').value;
-        const eAAfter = document.getElementById('eA-after').value;
-        const eRAfter = document.getElementById('eR-after').value;
-        const eOAfter = document.getElementById('eO-after').value;
+        const ecABefore = document.getElementById('ecA-before').value;
+        const ecRBefore = document.getElementById('ecR-before').value;
+        const ecTBefore = document.getElementById('ecT-before').value;
+        const ecAAfter = document.getElementById('ecA-after').value;
+        const ecRAfter = document.getElementById('ecR-after').value;
+        const ecTAfter = document.getElementById('ecT-after').value;
 
         const correctPABefore = mass1 * velocity1;
         const correctPRBefore = mass2 * velocity2;
-        const correctPOBefore = correctPABefore + correctPRBefore;
+        const correctPTBefore = correctPABefore + correctPRBefore;
         const correctPAAfter = mass1 * ball1.velocityX;
         const correctPRAfter = mass2 * ball2.velocityX;
-        const correctPOAfter = correctPAAfter + correctPRAfter;
+        const correctPTAfter = correctPAAfter + correctPRAfter;
 
-        const correctEABefore = 0.5 * mass1 * Math.pow(velocity1, 2);
-        const correctERBefore = 0.5 * mass2 * Math.pow(velocity2, 2);
-        const correctEOBefore = correctEABefore + correctERBefore;
-        const correctEAAfter = 0.5 * mass1 * Math.pow(ball1.velocityX, 2);
-        const correctERAfter = 0.5 * mass2 * Math.pow(ball2.velocityX, 2);
-        const correctEOAfter = correctEAAfter + correctERAfter;
+        const correctEcABefore = 0.5 * mass1 * Math.pow(velocity1, 2);
+        const correctEcRBefore = 0.5 * mass2 * Math.pow(velocity2, 2);
+        const correctEcTBefore = correctEcABefore + correctEcRBefore;
+        const correctEcAAfter = 0.5 * mass1 * Math.pow(ball1.velocityX, 2);
+        const correctEcRAfter = 0.5 * mass2 * Math.pow(ball2.velocityX, 2);
+        const correctEcTAfter = correctEcAAfter + correctEcRAfter;
 
         validateInput(pABefore, correctPABefore, 'pA-before');
         validateInput(pRBefore, correctPRBefore, 'pR-before');
-        validateInput(pOBefore, correctPOBefore, 'pO-before');
+        validateInput(pTBefore, correctPTBefore, 'pT-before');
         validateInput(pAAfter, correctPAAfter, 'pA-after');
         validateInput(pRAfter, correctPRAfter, 'pR-after');
-        validateInput(pOAfter, correctPOAfter, 'pO-after');
+        validateInput(pTAfter, correctPTAfter, 'pT-after');
 
-        validateInput(eABefore, correctEABefore, 'eA-before');
-        validateInput(eRBefore, correctERBefore, 'eR-before');
-        validateInput(eOBefore, correctEOBefore, 'eO-before');
-        validateInput(eAAfter, correctEAAfter, 'eA-after');
-        validateInput(eRAfter, correctERAfter, 'eR-after');
-        validateInput(eOAfter, correctEOAfter, 'eO-after');
+        validateInput(ecABefore, correctEcABefore, 'ecA-before');
+        validateInput(ecRBefore, correctEcRBefore, 'ecR-before');
+        validateInput(ecTBefore, correctEcTBefore, 'ecT-before');
+        validateInput(ecAAfter, correctEcAAfter, 'ecA-after');
+        validateInput(ecRAfter, correctEcRAfter, 'ecR-after');
+        validateInput(ecTAfter, correctEcTAfter, 'ecT-after');
     };
 
     function validateInput(value, correctValue, elementId) {
         const element = document.getElementById(elementId);
         const checkElement = document.createElement('span');
         checkElement.className = 'question-check';
-        if (parseFloat(value) === correctValue) {
+        if (parseFloat(value).toFixed(2) === correctValue.toFixed(2)) {
             checkElement.classList.add('check-ok');
         } else {
             checkElement.classList.add('check-ko');
