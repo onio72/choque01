@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador de Choque Inelástico</title>
+<title>Tema 10. Leyes de Newton. Choques (I)</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -28,6 +28,7 @@
 
     .table-container {
         margin: 20px;
+        width: 800px;
     }
 
     table {
@@ -39,6 +40,10 @@
         border: 1px solid #000;
         padding: 10px;
         text-align: center;
+    }
+
+    .questions {
+        margin: 20px;
     }
 </style>
 </head>
@@ -89,8 +94,62 @@
             </tr>
         </tbody>
     </table>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>\(E_{A}\)</th>
+                <th>\(E_{R}\)</th>
+                <th>\(E_{o}\)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Antes</td>
+                <td><input type="text" id="eA-before"> J</td>
+                <td><input type="text" id="eR-before"> J</td>
+                <td><input type="text" id="eO-before"> J</td>
+            </tr>
+            <tr>
+                <td>Después</td>
+                <td><input type="text" id="eA-after"> J</td>
+                <td><input type="text" id="eR-after"> J</td>
+                <td><input type="text" id="eO-after"> J</td>
+            </tr>
+        </tbody>
+    </table>
     <button id="submit">Enviar</button>
 </div>
+<div class="questions">
+    <p>1. El momento lineal de cada bola antes de la colisión es igual al momento lineal de cada bola después de la colisión. V / F</p>
+    <select id="q1">
+        <option value="V">V</option>
+        <option value="F">F</option>
+    </select>
+    <p>2. El momento lineal total antes de la colisión es igual al momento lineal total después de la colisión. V / F</p>
+    <select id="q2">
+        <option value="V">V</option>
+        <option value="F">F</option>
+    </select>
+    <p>3. La energía cinética de cada bola antes de la colisión es igual a la energía cinética de cada bola después de la colisión. V / F</p>
+    <select id="q3">
+        <option value="V">V</option>
+        <option value="F">F</option>
+    </select>
+    <p>4. La energía cinética total antes de la colisión es igual a la energía cinética total después de la colisión. V / F</p>
+    <select id="q4">
+        <option value="V">V</option>
+        <option value="F">F</option>
+    </select>
+    <p>5. Este choque es un choque:</p>
+    <select id="q5">
+        <option value="elástico">Elástico</option>
+        <option value="inelástico">Inelástico</option>
+    </select>
+    <br>
+    <button id="check">Corregir</button>
+</div>
+<p>Autor: Antonio González García</p>
 <script>
     const canvas = document.getElementById('animationCanvas');
     const ctx = canvas.getContext('2d');
@@ -108,6 +167,7 @@
     const resetButton = document.getElementById('reset');
     const slowButton = document.getElementById('slow');
     const submitButton = document.getElementById('submit');
+    const checkButton = document.getElementById('check');
 
     let mass1 = parseInt(mass1Slider.value);
     let mass2 = parseInt(mass2Slider.value);
@@ -238,6 +298,13 @@
         const pRAfter = document.getElementById('pR-after').value;
         const pOAfter = document.getElementById('pO-after').value;
 
+        const eABefore = document.getElementById('eA-before').value;
+        const eRBefore = document.getElementById('eR-before').value;
+        const eOBefore = document.getElementById('eO-before').value;
+        const eAAfter = document.getElementById('eA-after').value;
+        const eRAfter = document.getElementById('eR-after').value;
+        const eOAfter = document.getElementById('eO-after').value;
+
         const correctPABefore = mass1 * velocity1;
         const correctPRBefore = mass2 * velocity2;
         const correctPOBefore = correctPABefore + correctPRBefore;
@@ -245,17 +312,54 @@
         const correctPRAfter = mass2 * ball2.velocityX;
         const correctPOAfter = correctPAAfter + correctPRAfter;
 
+        const correctEABefore = 0.5 * mass1 * Math.pow(velocity1, 2);
+        const correctERBefore = 0.5 * mass2 * Math.pow(velocity2, 2);
+        const correctEOBefore = correctEABefore + correctERBefore;
+        const correctEAAfter = 0.5 * mass1 * Math.pow(ball1.velocityX, 2);
+        const correctERAfter = 0.5 * mass2 * Math.pow(ball2.velocityX, 2);
+        const correctEOAfter = correctEAAfter + correctERAfter;
+
         validateInput(pABefore, correctPABefore, 'pA-before');
         validateInput(pRBefore, correctPRBefore, 'pR-before');
         validateInput(pOBefore, correctPOBefore, 'pO-before');
         validateInput(pAAfter, correctPAAfter, 'pA-after');
         validateInput(pRAfter, correctPRAfter, 'pR-after');
         validateInput(pOAfter, correctPOAfter, 'pO-after');
+
+        validateInput(eABefore, correctEABefore, 'eA-before');
+        validateInput(eRBefore, correctERBefore, 'eR-before');
+        validateInput(eOBefore, correctEOBefore, 'eO-before');
+        validateInput(eAAfter, correctEAAfter, 'eA-after');
+        validateInput(eRAfter, correctERAfter, 'eR-after');
+        validateInput(eOAfter, correctEOAfter, 'eO-after');
     };
 
     function validateInput(value, correctValue, elementId) {
         const element = document.getElementById(elementId);
         if (parseFloat(value) === correctValue) {
+            element.style.color = 'green';
+        } else {
+            element.style.color = 'red';
+        }
+    }
+
+    checkButton.onclick = () => {
+        const q1 = document.getElementById('q1').value;
+        const q2 = document.getElementById('q2').value;
+        const q3 = document.getElementById('q3').value;
+        const q4 = document.getElementById('q4').value;
+        const q5 = document.getElementById('q5').value;
+
+        validateQuestion(q1, 'F', 'q1');
+        validateQuestion(q2, 'V', 'q2');
+        validateQuestion(q3, 'F', 'q3');
+        validateQuestion(q4, 'F', 'q4');
+        validateQuestion(q5, 'inelástico', 'q5');
+    };
+
+    function validateQuestion(answer, correctAnswer, elementId) {
+        const element = document.getElementById(elementId);
+        if (answer === correctAnswer) {
             element.style.color = 'green';
         } else {
             element.style.color = 'red';
