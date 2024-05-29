@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Choque Inelástico</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    .controls {
+        margin: 20px;
+    }
+
+    .animation-container {
+        position: relative;
+        width: 800px;
+        height: 400px;
+        border: 1px solid #000;
+        background: #f0f0f0;
+    }
+
+    canvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    .table-container {
+        margin: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        padding: 10px;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+<div class="controls">
+    <label for="mass1">Masa de la bola azul:</label>
+    <input type="range" id="mass1" min="1" max="10" value="5">
+    <span id="mass1-value">5</span> kg
+    <br>
+    <label for="mass2">Masa de la bola roja:</label>
+    <input type="range" id="mass2" min="1" max="10" value="5">
+    <span id="mass2-value">5</span> kg
+    <br>
+    <label for="velocity1">Velocidad de la bola azul:</label>
+    <input type="range" id="velocity1" min="1" max="10" value="5">
+    <span id="velocity1-value">5</span> m/s
+    <br>
+    <button id="start">Iniciar</button>
+    <button id="pause">Pausa</button>
+    <button id="reset">Reiniciar</button>
+    <button id="slow">Ralentizar</button>
+</div>
+<div class="animation-container">
+    <canvas id="animationCanvas"></canvas>
+</div>
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>\(p_{A}\)</th>
+                <th>\(p_{R}\)</th>
+                <th>\(p_{o}\)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Antes</td>
+                <td><input type="text" id="pA-before"> kg·m/s</td>
+                <td><input type="text" id="pR-before"> kg·m/s</td>
+                <td><input type="text" id="pO-before"> kg·m/s</td>
+            </tr>
+            <tr>
+                <td>Después</td>
+                <td><input type="text" id="pA-after"> kg·m/s</td>
+                <td><input type="text" id="pR-after"> kg·m/s</td>
+                <td><input type="text" id="pO-after"> kg·m/s</td>
+            </tr>
+        </tbody>
+    </table>
+    <button id="submit">Enviar</button>
+</div>
+<script>
+    const canvas = document.getElementById('animationCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 800;
+    canvas.height = 400;
+
+    const mass1Slider = document.getElementById('mass1');
+    const mass2Slider = document.getElementById('mass2');
+    const velocity1Slider = document.getElementById('velocity1');
+    const mass1Value = document.getElementById('mass1-value');
+    const mass2Value = document.getElementById('mass2-value');
+    const velocity1Value = document.getElementById('velocity1-value');
+    const startButton = document.getElementById('start');
+    const pauseButton = document.getElementById('pause');
+    const resetButton = document.getElementById('reset');
+    const slowButton = document.getElementById('slow');
+    const submitButton = document.getElementById('submit');
+
+    let mass1 = parseInt(mass1Slider.value);
+    let mass2 = parseInt(mass2Slider.value);
+    let velocity1 = parseInt(velocity1Slider.value);
+    let velocity2 = 0; // Initially the red ball is stationary
+    let animationInterval;
+    let slowMotion = false;
+
+    mass1Slider.oninput = () => {
+        mass1 = parseInt(mass1Slider.value);
+        mass1Value.textContent = mass1;
+        updateSizes();
+    };
+
+    mass2Slider.oninput = () => {
+        mass2 = parseInt(mass2Slider.value);
+        mass2Value.textContent = mass2;
+        updateSizes();
+    };
+
+    velocity1Slider.oninput = () => {
+        velocity1 = parseInt(velocity1Slider.value);
+        velocity1Value.textContent = velocity1;
+    };
+
+    function updateSizes() {
+        ball1.radius = 20 + (mass1 - 1) * 3;
+        ball2.radius = 20 + (mass2 - 1) * 3;
+    }
+
+    const ball1 = {
+        x: 50,
+        y: canvas.height / 2,
+        radius: 35,
+        color: 'blue',
+        velocityX: 0
+    };
+
+    const ball2 = {
+        x: 400,
+        y: canvas.height / 2,
+        radius: 35,
+        color: 'red',
+        velocityX: 0
+    };
+
+    function drawBall(ball) {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawGrid() {
+        ctx.strokeStyle = '#ddd';
+        for (let i = 0; i < canvas.width; i += 20) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+        }
+        for (let j = 0; j < canvas.height; j += 20) {
+            ctx.beginPath();
+            ctx.moveTo(0, j);
+            ctx.lineTo(canvas.width, j);
+            ctx.stroke();
+        }
+    }
+
+    function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        drawBall(ball1);
+        drawBall(ball2);
+
+        ball1.x += ball1.velocityX;
+        ball2.x += ball2.velocityX;
+
+        if (ball1.x + ball1.radius >= ball2.x - ball2.radius) {
+            ball1.velocityX = (mass1 * velocity1 + mass2 * velocity2) / (mass1 + mass2);
+            ball2.velocityX = ball1.velocityX;
+        }
+
+        if (ball1.x - ball1.radius > canvas.width && ball2.x - ball2.radius > canvas.width) {
+            clearInterval(animationInterval);
+        }
+
+        ctx.fillStyle = 'black';
+        ctx.fillText(`${ball1.velocityX.toFixed(2)} m/s`, ball1.x - 20, ball1.y - ball1.radius - 10);
+        ctx.fillText(`${ball2.velocityX.toFixed(2)} m/s`, ball2.x - 20, ball2.y - ball2.radius - 10);
+    }
+
+    function startAnimation() {
+        ball1.velocityX = velocity1;
+        ball2.velocityX = velocity2;
+        clearInterval(animationInterval);
+        const intervalTime = slowMotion ? 100 : 20;
+        animationInterval = setInterval(update, intervalTime);
+    }
+
+    startButton.onclick = () => {
+        startAnimation();
+    };
+
+    pauseButton.onclick = () => {
+        clearInterval(animationInterval);
+    };
+
+    resetButton.onclick = () => {
+        ball1.x = 50;
+        ball2.x = 400;
+        ball1.velocityX = 0;
+        ball2.velocityX = 0;
+        update();
+    };
+
+    slowButton.onclick = () => {
+        slowMotion = !slowMotion;
+        startAnimation();
+    };
+
+    submitButton.onclick = () => {
+        const pABefore = document.getElementById('pA-before').value;
+        const pRBefore = document.getElementById('pR-before').value;
+        const pOBefore = document.getElementById('pO-before').value;
+        const pAAfter = document.getElementById('pA-after').value;
+        const pRAfter = document.getElementById('pR-after').value;
+        const pOAfter = document.getElementById('pO-after').value;
+
+        const correctPABefore = mass1 * velocity1;
+        const correctPRBefore = mass2 * velocity2;
+        const correctPOBefore = correctPABefore + correctPRBefore;
+        const correctPAAfter = mass1 * ball1.velocityX;
+        const correctPRAfter = mass2 * ball2.velocityX;
+        const correctPOAfter = correctPAAfter + correctPRAfter;
+
+        validateInput(pABefore, correctPABefore, 'pA-before');
+        validateInput(pRBefore, correctPRBefore, 'pR-before');
+        validateInput(pOBefore, correctPOBefore, 'pO-before');
+        validateInput(pAAfter, correctPAAfter, 'pA-after');
+        validateInput(pRAfter, correctPRAfter, 'pR-after');
+        validateInput(pOAfter, correctPOAfter, 'pO-after');
+    };
+
+    function validateInput(value, correctValue, elementId) {
+        const element = document.getElementById(elementId);
+        if (parseFloat(value) === correctValue) {
+            element.style.color = 'green';
+        } else {
+            element.style.color = 'red';
+        }
+    }
+
+    update();
+</script>
+</body>
+</html>
