@@ -223,20 +223,23 @@
     const massRedSlider = document.getElementById('mass-red');
     const velocityBlueSlider = document.getElementById('velocity-blue');
     const velocityRedSlider = document.getElementById('velocity-red');
-    const restitutionSlider = document.getElementById('restitution');
     const massBlueValue = document.getElementById('mass-blue-val');
     const massRedValue = document.getElementById('mass-red-val');
     const velocityBlueValue = document.getElementById('velocity-blue-val');
     const velocityRedValue = document.getElementById('velocity-red-val');
-    const restitutionValue = document.getElementById('restitution-val');
     const slowMotionButton = document.getElementById('slow-motion-button');
 
     let mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
     let velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
     let velocityRed = 0; // Inicialmente en reposo
+    let scenario = Math.floor(Math.random() * 2) + 1; // Escoger aleatoriamente entre 1 y 2
     let restitution = 1; // Coeficiente de restitución fijo en 1
     let animationInterval;
     let slowMotion = false;
+
+    if (scenario === 2) {
+        velocityRed = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+    }
 
     function updateSliders() {
         massBlueSlider.value = mass;
@@ -250,9 +253,6 @@
 
         velocityRedSlider.value = velocityRed;
         velocityRedValue.textContent = velocityRed;
-
-        restitutionSlider.value = restitution;
-        restitutionValue.textContent = restitution;
     }
 
     updateSliders();
@@ -317,7 +317,7 @@
         ballRed.x += ballRed.velocityX;
 
         if (ballBlue.x + ballBlue.radius >= ballRed.x - ballRed.radius) {
-            if (velocityRed === 0) {
+            if (scenario === 1) {
                 ballBlue.velocityX = 0;
                 ballRed.velocityX = velocityBlue;
             } else {
@@ -354,13 +354,22 @@
     };
 
     document.getElementById('reset-button').onclick = () => {
+        mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+        velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+        scenario = Math.floor(Math.random() * 2) + 1; // Escoger aleatoriamente entre 1 y 2
+        if (scenario === 2) {
+            velocityRed = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+        } else {
+            velocityRed = 0; // Inicialmente en reposo
+        }
+        updateSliders();
+        updateSizes();
+        ballBlue.mass = mass;
+        ballRed.mass = mass;
         ballBlue.x = 50;
         ballRed.x = 400;
         ballBlue.velocityX = 0;
         ballRed.velocityX = 0;
-        updateSizes();
-        slowMotion = false;
-        slowMotionButton.textContent = 'Ralentizar';
         update();
     };
 
@@ -450,7 +459,12 @@
     function newExample() {
         mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
         velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
-        velocityRed = Math.floor(Math.random() * 20); // Valor aleatorio entre 0 y 20
+        scenario = Math.floor(Math.random() * 2) + 1; // Escoger aleatoriamente entre 1 y 2
+        if (scenario === 2) {
+            velocityRed = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+        } else {
+            velocityRed = 0; // Inicialmente en reposo
+        }
         updateSliders();
         updateSizes();
         ballBlue.mass = mass;
