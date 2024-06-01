@@ -77,6 +77,10 @@
         .hidden {
             display: none;
         }
+        input[disabled] {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -93,16 +97,12 @@
     <span id="mass-red-val">5</span> kg
 
     <label for="velocity-blue">Velocidad Bola Azul:</label>
-    <input type="range" id="velocity-blue" min="1" max="20" value="10">
+    <input type="range" id="velocity-blue" min="1" max="20" value="10" disabled>
     <span id="velocity-blue-val">10</span> m/s
 
     <label for="velocity-red">Velocidad Bola Roja:</label>
-    <input type="range" id="velocity-red" min="0" max="20" value="0">
+    <input type="range" id="velocity-red" min="0" max="20" value="0" disabled>
     <span id="velocity-red-val">0</span> m/s
-
-    <label for="restitution">Coeficiente de Restitución:</label>
-    <input type="range" id="restitution" min="1" max="1" step="0.01" value="1" disabled>
-    <span id="restitution-val">1</span>
 </div>
 
 <div id="controls">
@@ -385,29 +385,29 @@
         const ecT_despues = parseFloat(document.getElementById('ecT-despues').value);
 
         const correctP_A_antes = mass * velocityBlue;
-        const correctP_R_antes = mass * velocityRed;
+        const correctP_R_antes = velocityRed === 0 ? 0 : mass * velocityRed;
         const correctP_T_antes = correctP_A_antes + correctP_R_antes;
-        const correctP_A_despues = mass * velocityRed;
-        const correctP_R_despues = mass * velocityBlue;
+        const correctP_A_despues = velocityRed === 0 ? 0 : mass * velocityRed;
+        const correctP_R_despues = velocityRed === 0 ? mass * velocityBlue : mass * velocityBlue;
         const correctP_T_despues = correctP_A_despues + correctP_R_despues;
 
         const correctEC_A_antes = 0.5 * mass * Math.pow(velocityBlue, 2);
-        const correctEC_R_antes = 0.5 * mass * Math.pow(velocityRed, 2);
+        const correctEC_R_antes = velocityRed === 0 ? 0 : 0.5 * mass * Math.pow(velocityRed, 2);
         const correctEC_T_antes = correctEC_A_antes + correctEC_R_antes;
-        const correctEC_A_despues = 0.5 * mass * Math.pow(velocityRed, 2);
+        const correctEC_A_despues = velocityRed === 0 ? 0 : 0.5 * mass * Math.pow(velocityRed, 2);
         const correctEC_R_despues = 0.5 * mass * Math.pow(velocityBlue, 2);
         const correctEC_T_despues = correctEC_A_despues + correctEC_R_despues;
 
         validateAnswer('pA-antes', pA_antes, correctP_A_antes);
-        validateAnswer('pR-antes', pR_antes, correctP_R_antes);
+        validateAnswer('pR-antes', pR_antes, correctP_R_antes, true);
         validateAnswer('pT-antes', pT_antes, correctP_T_antes);
-        validateAnswer('pA-despues', pA_despues, correctP_A_despues);
+        validateAnswer('pA-despues', pA_despues, correctP_A_despues, true);
         validateAnswer('pR-despues', pR_despues, correctP_R_despues);
         validateAnswer('pT-despues', pT_despues, correctP_T_despues);
         validateAnswer('ecA-antes', ecA_antes, correctEC_A_antes);
-        validateAnswer('ecR-antes', ecR_antes, correctEC_R_antes);
+        validateAnswer('ecR-antes', ecR_antes, correctEC_R_antes, true);
         validateAnswer('ecT-antes', ecT_antes, correctEC_T_antes);
-        validateAnswer('ecA-despues', ecA_despues, correctEC_A_despues);
+        validateAnswer('ecA-despues', ecA_despues, correctEC_A_despues, true);
         validateAnswer('ecR-despues', ecR_despues, correctEC_R_despues);
         validateAnswer('ecT-despues', ecT_despues, correctEC_T_despues);
 
@@ -418,13 +418,15 @@
         validateQuestion('q5', 'Elástico');
     }
 
-    function validateAnswer(id, givenValue, correctValue) {
+    function validateAnswer(id, givenValue, correctValue, allowZero = false) {
         const input = document.getElementById(id);
         const resultElement = input.nextElementSibling;
         if (resultElement && resultElement.tagName === 'SPAN') {
             resultElement.remove();
         }
-        if (Math.abs((givenValue - correctValue) / correctValue) < 0.02) { // Tolerancia del 2%
+        if (allowZero && givenValue === 0) {
+            input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
+        } else if (Math.abs((givenValue - correctValue) / correctValue) < 0.02) { // Tolerancia del 2%
             input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
         } else {
             input.insertAdjacentHTML('afterend', ' <span class="result-ko">&#10008;</span>');
