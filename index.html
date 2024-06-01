@@ -1,267 +1,275 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tema 10. Leyes de Newton. Choques (I)</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-    }
-
-    .title {
-        font-size: 24px;
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .controls {
-        margin: 20px;
-    }
-
-    .animation-container {
-        position: relative;
-        width: 800px;
-        height: 400px;
-        border: 1px solid #000;
-        background: #f0f0f0;
-    }
-
-    canvas {
-        width: 100%;
-        height: 100%;
-    }
-
-    .table-container {
-        margin: 20px;
-        width: 800px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        border: 1px solid #000;
-        padding: 10px;
-        text-align: center;
-    }
-
-    input[type="text"] {
-        width: 80px;
-    }
-
-    .questions {
-        margin: 20px;
-    }
-
-    .questions p {
-        font-size: 18px;
-    }
-
-    .questions h2 {
-        font-size: 24px;
-    }
-
-    .question-check {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-size: contain;
-    }
-
-    .check-ok {
-        background-image: url('https://img.icons8.com/color/48/000000/checkmark--v1.png');
-    }
-
-    .check-ko {
-        background-image: url('https://img.icons8.com/color/48/000000/cancel--v1.png');
-    }
-
-    .spacer {
-        margin-bottom: 20px;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Tema 10. Leyes de Newton. Choques (I)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #simulator {
+            position: relative;
+            width: 800px;
+            height: 300px;
+            border: 1px solid black;
+            margin: 20px auto;
+            background: #f0f0f0;
+        }
+        .ball {
+            position: absolute;
+            bottom: 50px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            font-size: 12px;
+            color: white;
+        }
+        #ball-blue {
+            background-color: blue;
+        }
+        #ball-red {
+            background-color: red;
+        }
+        #controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            margin: 10px auto;
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: center;
+        }
+        .input-box {
+            width: 60px;
+        }
+        .question {
+            text-align: left;
+            margin: 20px auto;
+            width: 60%;
+        }
+        .question label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .result-ok {
+            color: green;
+            font-weight: bold;
+        }
+        .result-ko {
+            color: red;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 14px;
+        }
+        #calculations {
+            text-align: center;
+            font-size: smaller;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<div class="title">Tema 10. Leyes de Newton. Choques (I)</div>
-<div class="controls">
-    <label for="mass1">Masa de la bola azul:</label>
-    <input type="range" id="mass1" min="1" max="10" value="5">
-    <span id="mass1-value">5</span> kg
-    <br>
-    <label for="mass2">Masa de la bola roja:</label>
-    <input type="range" id="mass2" min="1" max="10" value="5">
-    <span id="mass2-value">5</span> kg
-    <br>
-    <label for="velocity1">Velocidad de la bola azul:</label>
-    <input type="range" id="velocity1" min="1" max="10" value="5">
-    <span id="velocity1-value">5</span> m/s
-    <br>
-    <button id="start">Iniciar</button>
-    <button id="pause">Pausa</button>
-    <button id="reset">Reiniciar</button>
-    <button id="slow">Ralentizar</button>
+
+<h1>Tema 10. Leyes de Newton. Choques (I)</h1>
+
+<div id="controls">
+    <label for="mass-blue">Masa Bola Azul:</label>
+    <input type="range" id="mass-blue" min="1" max="10" value="5" disabled>
+    <span id="mass-blue-val">5</span> kg
+
+    <label for="mass-red">Masa Bola Roja:</label>
+    <input type="range" id="mass-red" min="1" max="10" value="5" disabled>
+    <span id="mass-red-val">5</span> kg
+
+    <label for="velocity-blue">Velocidad Bola Azul:</label>
+    <input type="range" id="velocity-blue" min="1" max="20" value="10" disabled>
+    <span id="velocity-blue-val">10</span> m/s
+
+    <label for="restitution">Coeficiente de Restitución:</label>
+    <input type="range" id="restitution" min="0" max="1" step="0.01" value="1" disabled>
+    <span id="restitution-val">1</span>
 </div>
-<div class="animation-container">
+
+<div id="controls">
+    <button id="animate-button" onclick="startAnimation()">Animar</button>
+    <button id="pause-button" onclick="pauseAnimation()">Pausa</button>
+    <button id="reset-button" onclick="resetAnimation()">Reiniciar</button>
+    <button id="slow-motion-button" onclick="toggleSlowMotion()">Ralentizar</button>
+</div>
+
+<div id="simulator">
     <canvas id="animationCanvas"></canvas>
 </div>
-<div class="table-container">
-    <p>Realiza los cálculos adecuados redondeando hasta la centésima y completa la tabla. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
+
+<div id="calculations">
+    <p>Realiza los cálculos adecuados redondeando hasta la centésima y completa la tabla. Usa el punto como separador decimal. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
+    <p>Calcula los momentos lineales de ambas bolas y del conjunto, antes y después de la colisión.</p>
     <table>
-        <thead>
-            <tr>
-                <th></th>
-                <th>p<sub>A</sub></th>
-                <th>p<sub>R</sub></th>
-                <th>p<sub>T</sub></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Antes</td>
-                <td><input type="text" id="pA-before"> kg·m/s</td>
-                <td><input type="text" id="pR-before"> kg·m/s</td>
-                <td><input type="text" id="pT-before"> kg·m/s</td>
-            </tr>
-            <tr>
-                <td>Después</td>
-                <td><input type="text" id="pA-after"> kg·m/s</td>
-                <td><input type="text" id="pR-after"> kg·m/s</td>
-                <td><input type="text" id="pT-after"> kg·m/s</td>
-            </tr>
-        </tbody>
+        <tr>
+            <th></th>
+            <th>p<sub>A</sub> (kg.m/s)</th>
+            <th>p<sub>R</sub> (kg.m/s)</th>
+            <th>p<sub>T</sub> (kg.m/s)</th>
+        </tr>
+        <tr>
+            <td>Antes</td>
+            <td><input class="input-box" id="pA-antes"> kg.m/s</td>
+            <td><input class="input-box" id="pR-antes"> kg.m/s</td>
+            <td><input class="input-box" id="pT-antes"> kg.m/s</td>
+        </tr>
+        <tr>
+            <td>Después</td>
+            <td><input class="input-box" id="pA-despues"> kg.m/s</td>
+            <td><input class="input-box" id="pR-despues"> kg.m/s</td>
+            <td><input class="input-box" id="pT-despues"> kg.m/s</td>
+        </tr>
     </table>
-    <div class="spacer"></div>
+    <p>Calcula las energías cinéticas de ambas bolas y del conjunto, antes y después de la colisión.</p>
     <table>
-        <thead>
-            <tr>
-                <th></th>
-                <th>Ec<sub>A</sub></th>
-                <th>Ec<sub>R</sub></th>
-                <th>Ec<sub>T</sub></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Antes</td>
-                <td><input type="text" id="ecA-before"> J</td>
-                <td><input type="text" id="ecR-before"> J</td>
-                <td><input type="text" id="ecT-before"> J</td>
-            </tr>
-            <tr>
-                <td>Después</td>
-                <td><input type="text" id="ecA-after"> J</td>
-                <td><input type="text" id="ecR-after"> J</td>
-                <td><input type="text" id="ecT-after"> J</td>
-            </tr>
-        </tbody>
+        <tr>
+            <th></th>
+            <th>EC<sub>A</sub> (J)</th>
+            <th>EC<sub>R</sub> (J)</th>
+            <th>EC<sub>T</sub> (J)</th>
+        </tr>
+        <tr>
+            <td>Antes</td>
+            <td><input class="input-box" id="ecA-antes"> J</td>
+            <td><input class="input-box" id="ecR-antes"> J</td>
+            <td><input class="input-box" id="ecT-antes"> J</td>
+        </tr>
+        <tr>
+            <td>Después</td>
+            <td><input class="input-box" id="ecA-despues"> J</td>
+            <td><input class="input-box" id="ecR-despues"> J</td>
+            <td><input class="input-box" id="ecT-despues"> J</td>
+        </tr>
     </table>
-    <button id="submit">Enviar</button>
 </div>
-<div class="questions">
-    <h2>Preguntas</h2>
-    <p>1. El momento lineal de cada bola antes de la colisión es igual al momento lineal de cada bola después de la colisión.</p>
-    <select id="q1">
-        <option value="">- Sin seleccionar -</option>
-        <option value="V">Verdadero</option>
-        <option value="F">Falso</option>
-    </select>
-    <span class="question-check" id="q1-check"></span>
-    <p>2. El momento lineal total antes de la colisión es igual al momento lineal total después de la colisión.</p>
-    <select id="q2">
-        <option value="">- Sin seleccionar -</option>
-        <option value="V">Verdadero</option>
-        <option value="F">Falso</option>
-    </select>
-    <span class="question-check" id="q2-check"></span>
-    <p>3. La energía cinética de cada bola antes de la colisión es igual a la energía cinética de cada bola después de la colisión.</p>
-    <select id="q3">
-        <option value="">- Sin seleccionar -</option>
-        <option value="V">Verdadero</option>
-        <option value="F">Falso</option>
-    </select>
-    <span class="question-check" id="q3-check"></span>
-    <p>4. La energía cinética total antes de la colisión es igual a la energía cinética total después de la colisión.</p>
-    <select id="q4">
-        <option value="">- Sin seleccionar -</option>
-        <option value="V">Verdadero</option>
-        <option value="F">Falso</option>
-    </select>
-    <span class="question-check" id="q4-check"></span>
-    <p>5. Este choque es un choque:</p>
-    <select id="q5">
-        <option value="elástico">Elástico</option>
-        <option value="inelástico">Inelástico</option>
-    </select>
-    <span class="question-check" id="q5-check"></span>
-    <br><br>
-    <button id="check">Corregir</button>
+
+<div class="question">
+    <p style="font-size: 18px;">Preguntas</p>
+    <label>1. El momento lineal de cada bola antes de la colisión es igual al momento lineal de cada bola después de la colisión.
+        <select id="q1">
+            <option value="">- Sin seleccionar -</option>
+            <option value="Verdadero">Verdadero</option>
+            <option value="Falso">Falso</option>
+        </select>
+    </label>
+    <label>2. El momento lineal total antes de la colisión es igual al momento lineal total después de la colisión.
+        <select id="q2">
+            <option value="">- Sin seleccionar -</option>
+            <option value="Verdadero">Verdadero</option>
+            <option value="Falso">Falso</option>
+        </select>
+    </label>
+    <label>3. La energía cinética de cada bola antes de la colisión es igual a la energía cinética de cada bola después de la colisión.
+        <select id="q3">
+            <option value="">- Sin seleccionar -</option>
+            <option value="Verdadero">Verdadero</option>
+            <option value="Falso">Falso</option>
+        </select>
+    </label>
+    <label>4. La energía cinética total antes de la colisión es igual a la energía cinética total después de la colisión.
+        <select id="q4">
+            <option value="">- Sin seleccionar -</option>
+            <option value="Verdadero">Verdadero</option>
+            <option value="Falso">Falso</option>
+        </select>
+    </label>
+    <label>5. Este choque es un choque:
+        <select id="q5">
+            <option value="">- Sin seleccionar -</option>
+            <option value="Elástico">Elástico</option>
+            <option value="Inelástico">Inelástico</option>
+        </select>
+    </label>
 </div>
-<p>Autor: Antonio González García</p>
+
+<div id="controls">
+    <button onclick="checkAnswers()" style="display: inline-block; margin: 20px auto;">Enviar</button>
+    <button onclick="newExample()" style="display: inline-block; margin: 20px auto;">Otro ejemplo</button>
+</div>
+
+<footer>
+    Antonio González García<br>
+    <script>
+        document.write(new Date().toLocaleString());
+    </script>
+</footer>
+
 <script>
     const canvas = document.getElementById('animationCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = 800;
-    canvas.height = 400;
+    canvas.height = 300;
 
-    const mass1Slider = document.getElementById('mass1');
-    const mass2Slider = document.getElementById('mass2');
-    const velocity1Slider = document.getElementById('velocity1');
-    const mass1Value = document.getElementById('mass1-value');
-    const mass2Value = document.getElementById('mass2-value');
-    const velocity1Value = document.getElementById('velocity1-value');
-    const startButton = document.getElementById('start');
-    const pauseButton = document.getElementById('pause');
-    const resetButton = document.getElementById('reset');
-    const slowButton = document.getElementById('slow');
-    const submitButton = document.getElementById('submit');
-    const checkButton = document.getElementById('check');
+    const massBlueSlider = document.getElementById('mass-blue');
+    const massRedSlider = document.getElementById('mass-red');
+    const velocityBlueSlider = document.getElementById('velocity-blue');
+    const restitutionSlider = document.getElementById('restitution');
+    const massBlueValue = document.getElementById('mass-blue-val');
+    const massRedValue = document.getElementById('mass-red-val');
+    const velocityBlueValue = document.getElementById('velocity-blue-val');
+    const restitutionValue = document.getElementById('restitution-val');
+    const slowMotionButton = document.getElementById('slow-motion-button');
 
-    let mass1 = parseInt(mass1Slider.value);
-    let mass2 = parseInt(mass2Slider.value);
-    let velocity1 = parseInt(velocity1Slider.value);
-    let velocity2 = 0; // Initially the red ball is stationary
+    let massBlue = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+    let massRed = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+    let velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+    let restitution = 1; // Coeficiente de restitución fijo en 1
+    let velocityRed = 0;
     let animationInterval;
     let slowMotion = false;
 
-    mass1Slider.oninput = () => {
-        mass1 = parseInt(mass1Slider.value);
-        mass1Value.textContent = mass1;
-        updateSizes();
-    };
+    function updateSliders() {
+        massBlueSlider.value = massBlue;
+        massBlueValue.textContent = massBlue;
 
-    mass2Slider.oninput = () => {
-        mass2 = parseInt(mass2Slider.value);
-        mass2Value.textContent = mass2;
-        updateSizes();
-    };
+        massRedSlider.value = massRed;
+        massRedValue.textContent = massRed;
 
-    velocity1Slider.oninput = () => {
-        velocity1 = parseInt(velocity1Slider.value);
-        velocity1Value.textContent = velocity1;
-    };
+        velocityBlueSlider.value = velocityBlue;
+        velocityBlueValue.textContent = velocityBlue;
 
-    function updateSizes() {
-        ball1.radius = 20 + (mass1 - 1) * 3;
-        ball2.radius = 20 + (mass2 - 1) * 3;
+        restitutionSlider.value = restitution;
+        restitutionValue.textContent = restitution;
     }
 
-    const ball1 = {
+    updateSliders();
+
+    function updateSizes() {
+        ballBlue.radius = 20 + (massBlue - 1) * 3;
+        ballRed.radius = 20 + (massRed - 1) * 3;
+    }
+
+    const ballBlue = {
         x: 50,
         y: canvas.height / 2,
         radius: 35,
         color: 'blue',
-        velocityX: 0
+        velocityX: 0,
+        mass: massBlue
     };
 
-    const ball2 = {
+    const ballRed = {
         x: 400,
         y: canvas.height / 2,
         radius: 35,
         color: 'red',
-        velocityX: 0
+        velocityX: 0,
+        mass: massRed
     };
 
     function drawBall(ball) {
@@ -270,6 +278,9 @@
         ctx.fillStyle = ball.color;
         ctx.fill();
         ctx.closePath();
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Arial';
+        ctx.fillText(`${ball.mass} kg`, ball.x - 15, ball.y + 5);
     }
 
     function drawGrid() {
@@ -291,136 +302,159 @@
     function update() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawGrid();
-        drawBall(ball1);
-        drawBall(ball2);
+        drawBall(ballBlue);
+        drawBall(ballRed);
 
-        ball1.x += ball1.velocityX;
-        ball2.x += ball2.velocityX;
+        ballBlue.x += ballBlue.velocityX;
+        ballRed.x += ballRed.velocityX;
 
-        if (ball1.x + ball1.radius >= ball2.x - ball2.radius) {
-            ball1.velocityX = (mass1 * velocity1 + mass2 * velocity2) / (mass1 + mass2);
-            ball2.velocityX = ball1.velocityX;
+        if (ballBlue.x + ballBlue.radius >= ballRed.x - ballRed.radius) {
+            const combinedMass = massBlue + massRed;
+            const newVelocity = (massBlue * velocityBlue + massRed * velocityRed) / combinedMass;
+            ballBlue.velocityX = 0;
+            ballRed.velocityX = velocityBlue * massBlue / massRed;
         }
 
-        if (ball1.x - ball1.radius > canvas.width && ball2.x - ball2.radius > canvas.width) {
-            clearInterval(animationInterval);
+        if (ballRed.x - ballRed.radius > canvas.width) {
+            ballRed.x += ballRed.velocityX;
         }
 
         ctx.fillStyle = 'black';
-        ctx.fillText(`${ball1.velocityX.toFixed(2)} m/s`, ball1.x - 20, ball1.y - ball1.radius - 10);
-        ctx.fillText(`${ball2.velocityX.toFixed(2)} m/s`, ball2.x - 20, ball2.y - ball2.radius - 10);
+        ctx.font = '16px Arial';
+        ctx.fillText(`${ballBlue.velocityX.toFixed(2)} m/s`, ballBlue.x - 20, ballBlue.y - ballBlue.radius - 10);
+        ctx.fillText(`${ballRed.velocityX.toFixed(2)} m/s`, ballRed.x - 20, ballRed.y - ballRed.radius - 10);
     }
 
     function startAnimation() {
-        ball1.velocityX = velocity1;
-        ball2.velocityX = velocity2;
+        ballBlue.velocityX = velocityBlue;
+        ballRed.velocityX = velocityRed;
         clearInterval(animationInterval);
         const intervalTime = slowMotion ? 100 : 20;
         animationInterval = setInterval(update, intervalTime);
     }
 
-    startButton.onclick = () => {
+    document.getElementById('animate-button').onclick = () => {
         startAnimation();
     };
 
-    pauseButton.onclick = () => {
+    document.getElementById('pause-button').onclick = () => {
         clearInterval(animationInterval);
     };
 
-    resetButton.onclick = () => {
-        ball1.x = 50;
-        ball2.x = 400;
-        ball1.velocityX = 0;
-        ball2.velocityX = 0;
+    document.getElementById('reset-button').onclick = () => {
+        ballBlue.x = 50;
+        ballRed.x = 400;
+        ballBlue.velocityX = 0;
+        ballRed.velocityX = 0;
+        updateSizes();
+        slowMotion = false;
+        slowMotionButton.textContent = 'Ralentizar';
         update();
     };
 
-    slowButton.onclick = () => {
+    function toggleSlowMotion() {
         slowMotion = !slowMotion;
+        slowMotionButton.textContent = slowMotion ? 'Velocidad Normal' : 'Ralentizar';
         startAnimation();
-    };
-
-    submitButton.onclick = () => {
-        const pABefore = document.getElementById('pA-before').value;
-        const pRBefore = document.getElementById('pR-before').value;
-        const pTBefore = document.getElementById('pT-before').value;
-        const pAAfter = document.getElementById('pA-after').value;
-        const pRAfter = document.getElementById('pR-after').value;
-        const pTAfter = document.getElementById('pT-after').value;
-
-        const ecABefore = document.getElementById('ecA-before').value;
-        const ecRBefore = document.getElementById('ecR-before').value;
-        const ecTBefore = document.getElementById('ecT-before').value;
-        const ecAAfter = document.getElementById('ecA-after').value;
-        const ecRAfter = document.getElementById('ecR-after').value;
-        const ecTAfter = document.getElementById('ecT-after').value;
-
-        const correctPABefore = mass1 * velocity1;
-        const correctPRBefore = mass2 * velocity2;
-        const correctPTBefore = correctPABefore + correctPRBefore;
-        const correctPAAfter = mass1 * ball1.velocityX;
-        const correctPRAfter = mass2 * ball2.velocityX;
-        const correctPTAfter = correctPAAfter + correctPRAfter;
-
-        const correctEcABefore = 0.5 * mass1 * Math.pow(velocity1, 2);
-        const correctEcRBefore = 0.5 * mass2 * Math.pow(velocity2, 2);
-        const correctEcTBefore = correctEcABefore + correctEcRBefore;
-        const correctEcAAfter = 0.5 * mass1 * Math.pow(ball1.velocityX, 2);
-        const correctEcRAfter = 0.5 * mass2 * Math.pow(ball2.velocityX, 2);
-        const correctEcTAfter = correctEcAAfter + correctEcRAfter;
-
-        validateInput(pABefore, correctPABefore, 'pA-before');
-        validateInput(pRBefore, correctPRBefore, 'pR-before');
-        validateInput(pTBefore, correctPTBefore, 'pT-before');
-        validateInput(pAAfter, correctPAAfter, 'pA-after');
-        validateInput(pRAfter, correctPRAfter, 'pR-after');
-        validateInput(pTAfter, correctPTAfter, 'pT-after');
-
-        validateInput(ecABefore, correctEcABefore, 'ecA-before');
-        validateInput(ecRBefore, correctEcRBefore, 'ecR-before');
-        validateInput(ecTBefore, correctEcTBefore, 'ecT-before');
-        validateInput(ecAAfter, correctEcAAfter, 'ecA-after');
-        validateInput(ecRAfter, correctEcRAfter, 'ecR-after');
-        validateInput(ecTAfter, correctEcTAfter, 'ecT-after');
-    };
-
-    function validateInput(value, correctValue, elementId) {
-        const element = document.getElementById(elementId);
-        const checkElement = document.createElement('span');
-        checkElement.className = 'question-check';
-        if (parseFloat(value).toFixed(2) === correctValue.toFixed(2)) {
-            checkElement.classList.add('check-ok');
-        } else {
-            checkElement.classList.add('check-ko');
-        }
-        element.parentNode.appendChild(checkElement);
     }
 
-    checkButton.onclick = () => {
-        const q1 = document.getElementById('q1').value;
-        const q2 = document.getElementById('q2').value;
-        const q3 = document.getElementById('q3').value;
-        const q4 = document.getElementById('q4').value;
-        const q5 = document.getElementById('q5').value;
+    function checkAnswers() {
+        const pA_antes = parseFloat(document.getElementById('pA-antes').value);
+        const pR_antes = parseFloat(document.getElementById('pR-antes').value);
+        const pT_antes = parseFloat(document.getElementById('pT-antes').value);
+        const pA_despues = parseFloat(document.getElementById('pA-despues').value);
+        const pR_despues = parseFloat(document.getElementById('pR-despues').value);
+        const pT_despues = parseFloat(document.getElementById('pT-despues').value);
+        const ecA_antes = parseFloat(document.getElementById('ecA-antes').value);
+        const ecR_antes = parseFloat(document.getElementById('ecR-antes').value);
+        const ecT_antes = parseFloat(document.getElementById('ecT-antes').value);
+        const ecA_despues = parseFloat(document.getElementById('ecA-despues').value);
+        const ecR_despues = parseFloat(document.getElementById('ecR-despues').value);
+        const ecT_despues = parseFloat(document.getElementById('ecT-despues').value);
 
-        validateQuestion(q1, 'F', 'q1');
-        validateQuestion(q2, 'V', 'q2');
-        validateQuestion(q3, 'F', 'q3');
-        validateQuestion(q4, 'F', 'q4');
-        validateQuestion(q5, 'inelástico', 'q5');
-    };
+        // Check calculations
+        const correctP_A_antes = massBlue * velocityBlue;
+        const correctP_R_antes = 0;
+        const correctP_T_antes = correctP_A_antes + correctP_R_antes;
+        const newVelocity = (massBlue * velocityBlue + massRed * velocityRed) / (massBlue + massRed);
+        const correctP_A_despues = 0;
+        const correctP_R_despues = massRed * (velocityBlue * massBlue / massRed);
+        const correctP_T_despues = correctP_A_despues + correctP_R_despues;
 
-    function validateQuestion(answer, correctAnswer, elementId) {
-        const element = document.getElementById(elementId + '-check');
-        element.className = 'question-check';
-        if (answer === correctAnswer) {
-            element.classList.add('check-ok');
-        } else {
-            element.classList.add('check-ko');
+        const correctEC_A_antes = 0.5 * massBlue * Math.pow(velocityBlue, 2);
+        const correctEC_R_antes = 0;
+        const correctEC_T_antes = correctEC_A_antes + correctEC_R_antes;
+        const correctEC_A_despues = 0;
+        const correctEC_R_despues = 0.5 * massRed * Math.pow(velocityBlue * massBlue / massRed, 2);
+        const correctEC_T_despues = correctEC_A_despues + correctEC_R_despues;
+
+        validateAnswer('pA-antes', pA_antes, correctP_A_antes);
+        validateAnswer('pR-antes', pR_antes, correctP_R_antes, true);
+        validateAnswer('pT-antes', pT_antes, correctP_T_antes);
+        validateAnswer('pA-despues', pA_despues, correctP_A_despues, true);
+        validateAnswer('pR-despues', pR_despues, correctP_R_despues);
+        validateAnswer('pT-despues', pT_despues, correctP_T_despues);
+        validateAnswer('ecA-antes', ecA_antes, correctEC_A_antes);
+        validateAnswer('ecR-antes', ecR_antes, correctEC_R_antes, true);
+        validateAnswer('ecT-antes', ecT_antes, correctEC_T_antes);
+        validateAnswer('ecA-despues', ecA_despues, correctEC_A_despues, true);
+        validateAnswer('ecR-despues', ecR_despues, correctEC_R_despues);
+        validateAnswer('ecT-despues', ecT_despues, correctEC_T_despues);
+
+        validateQuestion('q1', 'Falso');
+        validateQuestion('q2', 'Verdadero');
+        validateQuestion('q3', 'Falso');
+        validateQuestion('q4', 'Verdadero');
+        validateQuestion('q5', 'Elástico');
+    }
+
+    function validateAnswer(id, givenValue, correctValue, allowZero = false) {
+        const input = document.getElementById(id);
+        const resultElement = input.nextElementSibling;
+        if (resultElement && resultElement.tagName === 'SPAN') {
+            resultElement.remove();
         }
+        if (allowZero && givenValue === 0) {
+            input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
+        } else if (Math.abs((givenValue - correctValue) / correctValue) < 0.02) { // Tolerancia del 2%
+            input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
+        } else {
+            input.insertAdjacentHTML('afterend', ' <span class="result-ko">&#10008;</span>');
+        }
+    }
+
+    function validateQuestion(id, correctAnswer) {
+        const question = document.getElementById(id);
+        const givenAnswer = question.value;
+        const resultElement = question.nextElementSibling;
+        if (resultElement && resultElement.tagName === 'SPAN') {
+            resultElement.remove();
+        }
+        if (givenAnswer === correctAnswer) {
+            question.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
+        } else {
+            question.insertAdjacentHTML('afterend', ' <span class="result-ko">&#10008;</span>');
+        }
+    }
+
+    function newExample() {
+        massBlue = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+        massRed = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+        velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+        restitution = 1; // Coeficiente de restitución fijo en 1
+        updateSliders();
+        updateSizes();
+        ballBlue.mass = massBlue;
+        ballRed.mass = massRed;
+        ballBlue.x = 50;
+        ballRed.x = 400;
+        ballBlue.velocityX = 0;
+        ballRed.velocityX = 0;
+        update();
     }
 
     update();
 </script>
+
 </body>
 </html>
