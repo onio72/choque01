@@ -101,7 +101,7 @@
     <span id="velocity-blue-val">10</span> m/s
 
     <label for="velocity-red">Velocidad Bola Roja:</label>
-    <input type="range" id="velocity-red" min="0" max="20" value="0" disabled>
+    <input type="range" id="velocity-red" min="-20" max="20" value="0" disabled>
     <span id="velocity-red-val">0</span> m/s
 </div>
 
@@ -251,8 +251,8 @@
         velocityBlueSlider.value = velocityBlue;
         velocityBlueValue.textContent = velocityBlue;
 
-        velocityRedSlider.value = Math.abs(velocityRed); // Mostrar valor absoluto en el slider
-        velocityRedValue.textContent = Math.abs(velocityRed);
+        velocityRedSlider.value = velocityRed;
+        velocityRedValue.textContent = velocityRed;
     }
 
     updateSliders();
