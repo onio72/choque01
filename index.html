@@ -238,7 +238,7 @@
     let slowMotion = false;
 
     if (scenario === 2) {
-        velocityRed = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+        velocityRed = -(Math.floor(Math.random() * 20) + 1); // Valor aleatorio entre -1 y -20
     }
 
     function updateSliders() {
@@ -251,8 +251,8 @@
         velocityBlueSlider.value = velocityBlue;
         velocityBlueValue.textContent = velocityBlue;
 
-        velocityRedSlider.value = velocityRed;
-        velocityRedValue.textContent = velocityRed;
+        velocityRedSlider.value = Math.abs(velocityRed); // Mostrar valor absoluto en el slider
+        velocityRedValue.textContent = Math.abs(velocityRed);
     }
 
     updateSliders();
@@ -331,6 +331,10 @@
             ballRed.x += ballRed.velocityX;
         }
 
+        if (ballBlue.x + ballBlue.radius < 0) {
+            ballBlue.x += ballBlue.velocityX;
+        }
+
         ctx.fillStyle = 'black';
         ctx.font = '16px Arial';
         ctx.fillText(`${ballBlue.velocityX.toFixed(2)} m/s`, ballBlue.x - 20, ballBlue.y - ballBlue.radius - 10);
@@ -358,7 +362,7 @@
         velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
         scenario = Math.floor(Math.random() * 2) + 1; // Escoger aleatoriamente entre 1 y 2
         if (scenario === 2) {
-            velocityRed = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+            velocityRed = -(Math.floor(Math.random() * 20) + 1); // Valor aleatorio entre -1 y -20
         } else {
             velocityRed = 0; // Inicialmente en reposo
         }
@@ -461,7 +465,7 @@
         velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
         scenario = Math.floor(Math.random() * 2) + 1; // Escoger aleatoriamente entre 1 y 2
         if (scenario === 2) {
-            velocityRed = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
+            velocityRed = -(Math.floor(Math.random() * 20) + 1); // Valor aleatorio entre -1 y -20
         } else {
             velocityRed = 0; // Inicialmente en reposo
         }
