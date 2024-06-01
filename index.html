@@ -72,7 +72,7 @@
         }
         #calculations {
             text-align: center;
-            font-size: smaller;
+            font-size: smaller.
         }
         .hidden {
             display: none;
@@ -265,16 +265,16 @@
     const ballBlue = {
         x: 50,
         y: canvas.height / 2,
-        radius: 35,
+        radius: 20 + (mass - 1) * 3,
         color: 'blue',
         velocityX: 0,
         mass: mass
     };
 
     const ballRed = {
-        x: 400,
+        x: scenario === 1 ? 400 : 750,
         y: canvas.height / 2,
-        radius: 35,
+        radius: 20 + (mass - 1) * 3,
         color: 'red',
         velocityX: 0,
         mass: mass
@@ -366,12 +366,12 @@
         } else {
             velocityRed = 0; // Inicialmente en reposo
         }
+        ballRed.x = scenario === 1 ? 400 : 750;
         updateSliders();
         updateSizes();
         ballBlue.mass = mass;
         ballRed.mass = mass;
         ballBlue.x = 50;
-        ballRed.x = 400;
         ballBlue.velocityX = 0;
         ballRed.velocityX = 0;
         update();
@@ -469,12 +469,12 @@
         } else {
             velocityRed = 0; // Inicialmente en reposo
         }
+        ballRed.x = scenario === 1 ? 400 : 750;
         updateSliders();
         updateSizes();
         ballBlue.mass = mass;
         ballRed.mass = mass;
         ballBlue.x = 50;
-        ballRed.x = 400;
         ballBlue.velocityX = 0;
         ballRed.velocityX = 0;
         update();
